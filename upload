@@ -1,0 +1,26 @@
+#!/bin/bash
+
+NAME=$(awk -F": " 'NR==1{print $2}' blog)
+if [ -z "$NAME" ]; then
+	echo "No Title"
+	exit
+fi
+DATE=$(date +"%F")
+FILENAME="$DATE - $NAME.md"
+LINE="date: $DATE"
+echo $LINE > "$FILENAME"
+cat blog >> "$FILENAME"
+
+sftp username@127.00.00.1 &>/dev/null <<EOF
+	cd entries
+	put "$FILENAME"
+	bye
+EOF
+
+rm "$FILENAME"
+rm blog
+
+ssh username@127.0.0.1 &>/dev/null <<EOF
+	~/bin/benjen
+	exit
+EOF
